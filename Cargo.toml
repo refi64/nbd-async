@@ -10,6 +10,10 @@ edition = "2018"
 keywords = ["nbd", "block-device", "userspace"]
 categories = ["filesystem", "asynchronous", "os", "network-programming"]
 
+[features]
+default = []
+send = []
+
 [dependencies]
 async-trait = "0.1"
 byteorder = "1.4"

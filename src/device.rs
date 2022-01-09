@@ -14,6 +14,7 @@ use tokio::{
 use crate::{nbd, sys};
 
 /// A block device.
+#[cfg(not(feature = "send"))]
 #[async_trait(?Send)]
 pub trait BlockDevice {
     /// Read a block from offset.
@@ -27,6 +28,21 @@ pub trait BlockDevice {
         Ok(())
     }
     /// Marks blocks as unused
+    async fn trim(&mut self, _offset: u64, _size: usize) -> io::Result<()> {
+        Ok(())
+    }
+}
+
+#[cfg(feature = "send")]
+#[async_trait]
+pub trait BlockDevice: Send {
+    async fn read(&mut self, offset: u64, buf: &mut [u8]) -> io::Result<()>;
+    async fn write(&mut self, _offset: u64, _buf: &[u8]) -> io::Result<()> {
+        Err(io::ErrorKind::InvalidInput.into())
+    }
+    async fn flush(&mut self) -> io::Result<()> {
+        Ok(())
+    }
     async fn trim(&mut self, _offset: u64, _size: usize) -> io::Result<()> {
         Ok(())
     }
